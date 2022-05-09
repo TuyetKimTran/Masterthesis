@@ -1,50 +1,22 @@
-## Welcome to GitHub Pages
-
-You can use the [editor on GitHub](https://github.com/TuyetKimTran/Masterthesis/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
-
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/TuyetKimTran/Masterthesis/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+## Masterthesis
 
 
-# Instructions
+### List of survey papers
 
 
-- List of survey papers
-- List papers (ordered based on the year of publication) 
-      - Publication year, Publisher name, paper title [Link to the paper], [link to the codes, if existing]
-- List of the datasets 
-      - Publication year, Dataset name [Link to the dataset page], Give a short summary of the dataset using bulletin(i.e., image-based?video?sound?the number of       samples? the annotation labels? the number of frames? the volume of the dataset?...)
-- Evaluation metrics (introduce the links to the materials that explain these metrics. They could be papers, tutorials, or webpage)
-- Useful links (name any useful tutorial/webpage/paper that is useful in your opinion)
+### List of papers 
+(ordered based on the year of publication), Publication year, Publisher name, paper title [Link to the paper], [link to the codes, if existing]
 
-Some searching tips:
+### List of datasets 
+
+- Publication year, Dataset name [Link to the dataset page], Give a short summary of the dataset using bulletin(i.e., image-based?video?sound?the number of       samples? the annotation labels? the number of frames? the volume of the dataset?...)
+### Evaluation metrics (introduce the links to the materials that explain these metrics. They could be papers, tutorials, or webpage)
+### Useful links (name any useful tutorial/webpage/paper that is useful in your opinion)
+
+
+
+
+# Some searching tip
 - Use different keywords (if you read the introduction of the several first papers, you can find suitable keywords to find the other papers)
 - Use a combination of keywords (deep learning + personality perception; survey + sentimental analysis; ...)
 - See the list of papers that have cited the well-known datasets. There is a ''Cited by ...'' link in google scholar below each paper item. That link shows the papers that have been cited, let's say, the well-known dataset paper.
@@ -55,3 +27,5 @@ Some searching tips:
 ### Support or Contact
 
 Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+

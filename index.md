@@ -36,13 +36,13 @@ Your Pages site will use the layout and styles from the Jekyll theme you have se
 # Instructions
 
 
-•	List of survey papers
-•	List papers (ordered based on the year of publication) 
-o	Publication year, Publisher name, paper title [Link to the paper], [link to the codes, if existing]
-•	List of the datasets 
-o	Publication year, Dataset name [Link to the dataset page], Give a short summary of the dataset using bulletin(i.e., image-based?video?sound?the number of samples? the annotation labels? the number of frames? the volume of the dataset?...)
-•	Evaluation metrics (introduce the links to the materials that explain these metrics. They could be papers, tutorials, or webpage)
-•	Useful links (name any useful tutorial/webpage/paper that is useful in your opinion)
+- List of survey papers
+- List papers (ordered based on the year of publication) 
+      - Publication year, Publisher name, paper title [Link to the paper], [link to the codes, if existing]
+- List of the datasets 
+      - Publication year, Dataset name [Link to the dataset page], Give a short summary of the dataset using bulletin(i.e., image-based?video?sound?the number of       samples? the annotation labels? the number of frames? the volume of the dataset?...)
+- Evaluation metrics (introduce the links to the materials that explain these metrics. They could be papers, tutorials, or webpage)
+- Useful links (name any useful tutorial/webpage/paper that is useful in your opinion)
 
 Some searching tips:
 - Use different keywords (if you read the introduction of the several first papers, you can find suitable keywords to find the other papers)

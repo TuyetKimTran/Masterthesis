@@ -249,6 +249,8 @@ to him/her who work with the Dataset "
 they don't share data anymore : " In 2018, we decided to stop sharing the data with other scholars. Maintaining the data set, vetting the projects, responding to the inquiries, and complying with various regulations had become too burdensome for the two of us. "  [link](https://sites.google.com/michalkosinski.com/mypersonality)
 
 
+## Evaluation Metrics
+- most paper used Accuracy as evaluation. Only ~2 paper i accrossed used Recall, Precision and f1 Score additionally 
 
 ## Other Notes
 - personality prediction similar to emotion prediction difference but personality is more diverse therefore more difficult

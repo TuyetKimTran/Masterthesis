@@ -139,7 +139,7 @@ training set mean
 - auditory stream, visual stream, audiovisual stream of fully connected layer (did not mention if early or late fusion but the way I understood the fusion, it should be late fusion) 
 - has [code](https://github.com/yagguc/deep_impression)
 
-[15]	C. Sarkar, S. Bhatia, A. Agarwal, and J. Li, “Feature Analysis for Computational Personality Recognition Using YouTube Personality Data set,” in Proceedings of the 2014 ACM Multi Media on Workshop on Computational Personality Recognition - WCPR '14, Orlando, Florida, USA, 2014, pp. 11–14.
+[15]	C. Sarkar, S. Bhatia, A. Agarwal, and J. Li, “Feature Analysis for Computational Personality Recognition Using YouTube Personality Data set,” in Proceedings of the **2014** ACM Multi Media on Workshop on Computational Personality Recognition - WCPR '14, Orlando, Florida, USA, 2014, pp. 11–14.
 
 - _Dataset_ : YouTube personality data set
 - rather old paper, but gives a short insight about the beginnings of working multimodally when it comes to personality traits + it does consider not only audio, visual and text as modality:

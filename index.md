@@ -1,7 +1,7 @@
-## Masterthesis
+# Masterthesis
 
 
-### List of papers (ordered based on the year of publication, descending)
+## List of papers (ordered based on the year of publication, descending)
 
 [1]	C. Suman, S. Saha, A. Gupta, S. K. Pandey, and P. Bhattacharyya, “A multi-modal personality prediction system,” Knowledge-Based Systems, vol. 236, p. 107715, **2022**, doi: 10.1016/j.knosys.2021.107715.
 
@@ -153,7 +153,7 @@ training set mean
 - Evaluation: Precision, Recall and F score 
 
 
-### List of survey
+## List of survey
 
 [1]	X. Zhao, Z. Tang, and S. Zhang, “Deep Personality Trait Recognition: A Survey,” Front. Psychol., vol. 13, **2022**, doi: 10.3389/fpsyg.2022.839619.
 
@@ -177,7 +177,7 @@ training set mean
 
 
 
-### List of datasets 
+## List of datasets 
 ![image](https://user-images.githubusercontent.com/61424213/169427751-66dd7268-f212-4554-8a17-0b94b32076d9.png)
 
 
@@ -194,6 +194,10 @@ keys = names of the videos, values = transcriptions
 - annotation: dictionary of dictionaries :  the keys of the outer dictionary are the names of the annotations and their values are dictionaries.;  keys of the inner dictionaries are the names of the videos and their values are the actual annotations corresponding to the keys of the outer dictionaries
 - [dataset link](https://chalearnlap.cvc.uab.cat/dataset/20/description/)
 [presentation: results, dataset](https://sergioescalera.com/wp-content/uploads/2016/10/corneanu.pdf)
+
+![image](https://user-images.githubusercontent.com/61424213/169427861-2042ef39-9cc4-46a5-a107-e6258ff8d2b7.png)
+
+
 #### ChaLearn First impressions V2
 -  consist of
 	- Quantitative competition (first stage). predict "invite for interview" variable
@@ -208,8 +212,7 @@ keys = names of the videos, values = transcriptions
   - interpretability: What in the model structure explains its functioning
   - why a determined parameter configuration was chosen, what the parameters mean, how a user could interpret the learned model, what additional knowledge would be required from the user/world to improve the model.
 
-
- ### Youtube Vlogs dataset // unimportant
+### Youtube Vlogs dataset // unimportant
 - 2269 videos, 469 different vloggers 
 - between 1 and 6 minutes, total 150h
 - can not find the dataset. It was from a Competition WCPR14 but the dataset is no longer available
@@ -244,4 +247,11 @@ to him/her who work with the Dataset "
 
 - myPersonality was a Facebook App allowing users to participate in psychological research by filling in personality questionnaires
 they don't share data anymore : " In 2018, we decided to stop sharing the data with other scholars. Maintaining the data set, vetting the projects, responding to the inquiries, and complying with various regulations had become too burdensome for the two of us. "  [link](https://sites.google.com/michalkosinski.com/mypersonality)
+
+
+
+## Other Notes
+- personality prediction similar to emotion prediction difference but personality is more diverse therefore more difficult
+- not so many datasets available. For prediction personality the most datasets came from competitions. 
+- most paper based on apparent personality analysis, not the true personality of the individuals 
 

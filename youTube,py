@@ -7,8 +7,8 @@ from keras.optimizers import RMSprop
 from keras.utils import to_categorical
 from keras.callbacks import EarlyStopping, Callback, ModelCheckpoint
 from keras.layers import *
-from keras.utils.layer_utils import get_source_inputs
-#from kutilities.layers import AttentionWithContext, Attention, MeanOverTime
+from keras.utils.layer_utils import get_source_inputs, MeanOverTime
+from kutilities.layers import AttentionWithContext, Attention, MeanOverTime
 from sklearn.metrics import classification_report, confusion_matrix, precision_recall_fscore_support, accuracy_score, f1_score
 global seed
 seed = 1337
@@ -68,35 +68,47 @@ def featuresExtraction():
         train_audio = pickle.load(f, encoding='latin1')
     train_audio = train_audio/np.max(train_audio)
 
-    valid_audio = np.load('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/covarep_valid.p',allow_pickle=True,mmap_mode='r')
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/covarep_valid.p', 'rb') as f:
+        valid_audio = pickle.load(f, encoding='latin1')
     valid_audio = valid_audio/np.max(valid_audio)
 
-    test_audio  = np.load('/Users/tuyet/Desktop/Masterthesis/YOUTUBE/covarep_test.p',mmap_mode='r')
+
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/covarep_test.p', 'rb') as f:
+        test_audio = pickle.load(f, encoding='latin1')
     test_audio  = test_audio/np.max(test_audio)
 
-    train_video = np.load('/home1/dushyant/featureExtractor/features/YOUTUBE/facet_train.p',mmap_mode='r')
+    with open ('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/facet_train.p', 'rb') as f:
+        train_video = pickle.load(f, encoding='latin1')
     train_video = train_video/np.max(train_video)
 
-    valid_video = np.load('/home1/dushyant/featureExtractor/features/YOUTUBE/facet_valid.p',mmap_mode='r')
+    with open ('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/facet_valid.p', 'rb') as f:
+        valid_video = pickle.load(f, encoding='latin1')
     valid_video = valid_video/np.max(valid_video)
 
-    test_video  = np.load('/home1/dushyant/featureExtractor/features/YOUTUBE/facet_test.p',mmap_mode='r')
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/facet_test.p', 'rb') as f:
+        test_video  = pickle.load(f, encoding='latin1')
     test_video  = test_video/np.max(test_video)
 
-    train_text  = np.load('/home1/dushyant/featureExtractor/features/YOUTUBE/text_train.p',mmap_mode='r')
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/text_train.p', 'rb') as f:
+        train_text  = pickle.load(f, encoding='latin1')
     train_text  = train_text/np.max(train_text)
 
-    valid_text  = np.load('/home1/dushyant/featureExtractor/features/YOUTUBE/text_valid.p',mmap_mode='r')
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/text_valid.p', 'rb') as f:
+        valid_text  = pickle.load(f, encoding='latin1')
     valid_text  = valid_text/np.max(valid_text)
 
-    test_text   = np.load('/home1/dushyant/featureExtractor/features/YOUTUBE/text_test.p',mmap_mode='r')
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/text_test.p', 'rb') as f:
+        test_text   = pickle.load(f, encoding='latin1')
     test_text   = test_text/np.max(test_text)
 
     max_segment_len = train_text.shape[1]
 
-    train_label = np.load('/home1/dushyant/featureExtractor/features/YOUTUBE/y_train.p',mmap_mode='r')
-    valid_label = np.load('/home1/dushyant/featureExtractor/features/YOUTUBE/y_valid.p',mmap_mode='r')
-    test_label  = np.load('/home1/dushyant/featureExtractor/features/YOUTUBE/y_test.p',mmap_mode='r')
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/y_train.p', 'rb') as f:
+        train_label = pickle.load(f, encoding='latin1')
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/y_valid.p', 'rb') as f:
+        valid_label = pickle.load(f, encoding='latin1')
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/y_test.p', 'rb') as f:
+        test_label  = pickle.load(f, encoding='latin1')
 
 # ================================================== simple 3 =========================================
 def CIA_model(mode, filePath, attn_type='mmmu', drops=[0.7, 0.5, 0.5], r_units=300, td_units=100):

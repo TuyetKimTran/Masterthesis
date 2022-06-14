@@ -1,6 +1,6 @@
 # Masterthesis
 
-<a href="/Masterthesis/Meeting_1.md">Meeting 1</a>
+<a href="/Masterthesis/Meeting1.md">Meeting 1</a>
 ## List of papers (ordered based on the year of publication, descending)
 
 [1]	C. Suman, S. Saha, A. Gupta, S. K. Pandey, and P. Bhattacharyya, “A multi-modal personality prediction system,” Knowledge-Based Systems, vol. 236, p. 107715, **2022**, doi: 10.1016/j.knosys.2021.107715.

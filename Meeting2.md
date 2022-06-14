@@ -255,3 +255,4 @@ they don't share data anymore : " In 2018, we decided to stop sharing the data w
 - not so many datasets available. For prediction personality the most datasets came from competitions. 
 - most paper based on apparent personality analysis, not the true personality of the individuals 
 
+[back](index.md)

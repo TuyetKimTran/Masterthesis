@@ -256,13 +256,13 @@ they don't share data anymore : " In 2018, we decided to stop sharing the data w
 - most paper based on apparent personality analysis, not the true personality of the individuals 
 
 
- <h2> TO-DO </h2>
-    <p>Read 5 papers and provide presentation. One of them is used as baseline and I should reproduce the results of it. Then the idea of the other papers are used to improve the baseline method. </p>
-    <ul>
-      <li> Deep Bimodal Regression of Apparent Personality Traits from Short Video Sequences (2018) </li>
-      <li> Context-aware Interactive Attention for Multi-modal Sentiment and Emotion Analysis (2019) </li>
-      <li> Learning Personalised Models for Automatic Self-Reported Personality Recognition (2022) </li>
-      <li> Is Cross-Attention Preferable to Self-Attention for Multi-Modal Emotion Recognition? (2022)  </li>
-      <li> A multi-modal personality prediction system (2022) </li>
-  </ul>
+ ## TO-DO 
+    Read 5 papers and provide presentation. One of them is used as baseline and I should reproduce the results of it. Then the idea of the other papers are used to improve the baseline method. 
+
+      - Deep Bimodal Regression of Apparent Personality Traits from Short Video Sequences (2018) 
+      - Context-aware Interactive Attention for Multi-modal Sentiment and Emotion Analysis (2019) 
+      - Learning Personalised Models for Automatic Self-Reported Personality Recognition (2022) 
+      - Is Cross-Attention Preferable to Self-Attention for Multi-Modal Emotion Recognition? (2022)  
+      - A multi-modal personality prediction system (2022) 
+      
 [Back](index.md)

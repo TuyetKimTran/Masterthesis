@@ -1,0 +1,2 @@
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.3559322033898305
+

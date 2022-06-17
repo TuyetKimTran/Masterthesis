@@ -7,8 +7,8 @@ from keras.optimizers import RMSprop
 from keras.utils import to_categorical
 from keras.callbacks import EarlyStopping, Callback, ModelCheckpoint
 from keras.layers import *
-from keras.utils.layer_utils import get_source_inputs, MeanOverTime
-from kutilities.layers import AttentionWithContext, Attention, MeanOverTime
+from keras.utils.layer_utils import get_source_inputs
+from kutilities.layers import MeanOverTime
 from sklearn.metrics import classification_report, confusion_matrix, precision_recall_fscore_support, accuracy_score, f1_score
 global seed
 seed = 1337
@@ -259,26 +259,28 @@ def CIA_model(mode, filePath, attn_type='mmmu', drops=[0.7, 0.5, 0.5], r_units=3
         model.compile(loss=['mse','mse','mse','mse','mse','mse','categorical_crossentropy'], sample_weight_mode='None', optimizer='adam', metrics=['accuracy'])
 
         path   = 'weights/'+str(filePath)+'_'+str(run)+'.hdf5'
+        print(path)
         check1 = EarlyStopping(monitor='val_final_output_loss', patience=20)
         check2 = ModelCheckpoint(path, monitor='val_final_output_acc', verbose=1, save_best_only=True, mode='max')
 
 
         history = model.fit([train_text,train_audio,train_video,train_text,train_text,train_audio,train_audio,train_video,train_video], [train_audio,train_video,train_text,train_video,train_text,train_audio,train_label],
-                            epochs=50,
-                            batch_size=16,
+                            epochs=50, #auf 50 zurück machen!! 
+                            batch_size=16, # auf 16 !!
                             shuffle=True,
                             callbacks=[check1, check2],
                             validation_data=([valid_text,valid_audio,valid_video,valid_text,valid_text,valid_audio,valid_audio,valid_video,valid_video], [valid_audio,valid_video,valid_text,valid_video,valid_text,valid_audio,valid_label]),
                             verbose=1)
 
-        model.load_weights(path)
+        # model.load_weights(path)
         result = model.predict([test_text,test_audio,test_video,test_text,test_text,test_audio,test_audio,test_video,test_video])
 
         np.ndarray.dump(result[len(in_test_label)],open('results/'+str(filePath)+'_'+str(run)+'.np', 'wb'))
         best_accuracy = calculate_accuracy(result[-1], test_label)
+        print('best accuracy is: ', best_accuracy)
 
         open('results/'+modality+'.txt', 'a').write(filePath + ', accuracy: ' + str(best_accuracy) + '\n'*2)
-
+    
 featuresExtraction()
 for drop in [0.5]:
     for rdrop in [0.3]:

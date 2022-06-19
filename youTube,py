@@ -10,6 +10,9 @@ from keras.layers import *
 from keras.utils.layer_utils import get_source_inputs
 from kutilities.layers import MeanOverTime
 from sklearn.metrics import classification_report, confusion_matrix, precision_recall_fscore_support, accuracy_score, f1_score
+import matplotlib.pyplot as plt
+
+
 global seed
 seed = 1337
 np.random.seed(seed)
@@ -58,60 +61,60 @@ def CAM(att_type, x, y):
         h_dash = dot([m, y], axes=[2,1])
         return multiply([h_dash, x])
 
-def featuresExtraction():
+def featuresExtraction(dataset):
     global train_text, train_audio, train_video, train_label
     global valid_text, valid_audio, valid_video, valid_label
     global test_text, test_audio, test_video, test_label
     global max_segment_len
 
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/covarep_train.p', 'rb') as f:
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/'+ dataset+ '/covarep_train.p', 'rb') as f:
         train_audio = pickle.load(f, encoding='latin1')
     train_audio = train_audio/np.max(train_audio)
 
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/covarep_valid.p', 'rb') as f:
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/covarep_valid.p', 'rb') as f:
         valid_audio = pickle.load(f, encoding='latin1')
     valid_audio = valid_audio/np.max(valid_audio)
 
 
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/covarep_test.p', 'rb') as f:
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/covarep_test.p', 'rb') as f:
         test_audio = pickle.load(f, encoding='latin1')
     test_audio  = test_audio/np.max(test_audio)
 
-    with open ('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/facet_train.p', 'rb') as f:
+    with open ('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/facet_train.p', 'rb') as f:
         train_video = pickle.load(f, encoding='latin1')
     train_video = train_video/np.max(train_video)
 
-    with open ('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/facet_valid.p', 'rb') as f:
+    with open ('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/facet_valid.p', 'rb') as f:
         valid_video = pickle.load(f, encoding='latin1')
     valid_video = valid_video/np.max(valid_video)
 
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/facet_test.p', 'rb') as f:
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/facet_test.p', 'rb') as f:
         test_video  = pickle.load(f, encoding='latin1')
     test_video  = test_video/np.max(test_video)
 
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/text_train.p', 'rb') as f:
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/text_train.p', 'rb') as f:
         train_text  = pickle.load(f, encoding='latin1')
     train_text  = train_text/np.max(train_text)
 
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/text_valid.p', 'rb') as f:
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/text_valid.p', 'rb') as f:
         valid_text  = pickle.load(f, encoding='latin1')
     valid_text  = valid_text/np.max(valid_text)
 
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/text_test.p', 'rb') as f:
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/text_test.p', 'rb') as f:
         test_text   = pickle.load(f, encoding='latin1')
     test_text   = test_text/np.max(test_text)
 
     max_segment_len = train_text.shape[1]
 
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/y_train.p', 'rb') as f:
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/y_train.p', 'rb') as f:
         train_label = pickle.load(f, encoding='latin1')
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/y_valid.p', 'rb') as f:
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/y_valid.p', 'rb') as f:
         valid_label = pickle.load(f, encoding='latin1')
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/YOUTUBE/y_test.p', 'rb') as f:
+    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/y_test.p', 'rb') as f:
         test_label  = pickle.load(f, encoding='latin1')
 
 # ================================================== simple 3 =========================================
-def CIA_model(mode, filePath, attn_type='mmmu', drops=[0.7, 0.5, 0.5], r_units=300, td_units=100):
+def CIA_model(mode, filePath, dataset, attn_type='mmmu', drops=[0.7, 0.5, 0.5], r_units=300, td_units=100):
 
     runs = 1
     best_accuracy = 0
@@ -250,38 +253,57 @@ def CIA_model(mode, filePath, attn_type='mmmu', drops=[0.7, 0.5, 0.5], r_units=3
 
         merged  = Dense(td_units, activation='relu')(merged)
         merged  = MeanOverTime()(merged)
-        final_output  = Dense(3, activation='softmax', name='final_output')(merged)
+        final_output  = Dense(2, activation='softmax', name='final_output')(merged)   # hier anpassen wieviele outputs man hat!!
 
         # =============================================================================================
         # ======================================= Model ===============================================
 
-        model = Model(inputs=[in_text,in_audio,in_video,in_text_audio,in_text_video,in_audio_text,in_audio_video,in_video_text,in_video_audio],outputs=[output_text_audio,output_text_video,output_audio_text,output_audio_video,output_video_text,output_video_audio,final_output])
-        model.compile(loss=['mse','mse','mse','mse','mse','mse','categorical_crossentropy'], sample_weight_mode='None', optimizer='adam', metrics=['accuracy'])
+        model = Model(inputs=[in_text,in_audio,in_video,in_text_audio,in_text_video,in_audio_text,in_audio_video,in_video_text,in_video_audio], # 3x single und die 6 combos
+        outputs=[output_text_audio,output_text_video,output_audio_text,output_audio_video,output_video_text,output_video_audio,final_output]) # 6 combos + final output
+        model.compile(loss=['mse','mse','mse','mse','mse','mse','categorical_crossentropy'], sample_weight_mode='None', optimizer='adam', metrics=['acc'])
+
+        # vorher metrics=['accuracy'])
 
         path   = 'weights/'+str(filePath)+'_'+str(run)+'.hdf5'
         print(path)
         check1 = EarlyStopping(monitor='val_final_output_loss', patience=20)
-        check2 = ModelCheckpoint(path, monitor='val_final_output_acc', verbose=1, save_best_only=True, mode='max')
+        check2 = ModelCheckpoint(path, monitor='val_final_output_acc', verbose=1,save_best_only=True, save_weights_only=True, mode='max')
 
 
-        history = model.fit([train_text,train_audio,train_video,train_text,train_text,train_audio,train_audio,train_video,train_video], [train_audio,train_video,train_text,train_video,train_text,train_audio,train_label],
+        history = model.fit([train_text,train_audio,train_video,train_text,train_text,train_audio,train_audio,train_video,train_video], 
+                            [train_audio,train_video,train_text,train_video,train_text,train_audio,train_label],
                             epochs=50, #auf 50 zurück machen!! 
                             batch_size=16, # auf 16 !!
                             shuffle=True,
                             callbacks=[check1, check2],
-                            validation_data=([valid_text,valid_audio,valid_video,valid_text,valid_text,valid_audio,valid_audio,valid_video,valid_video], [valid_audio,valid_video,valid_text,valid_video,valid_text,valid_audio,valid_label]),
+                            validation_data=([valid_text,valid_audio,valid_video,valid_text,valid_text,valid_audio,valid_audio,valid_video,valid_video], 
+                            [valid_audio,valid_video,valid_text,valid_video,valid_text,valid_audio,valid_label]),
                             verbose=1)
 
-        # model.load_weights(path)
+        model.load_weights(path)
         result = model.predict([test_text,test_audio,test_video,test_text,test_text,test_audio,test_audio,test_video,test_video])
+        print('results', result)
+        print('results[-1]' , result[-1])
+        print('testlabel' , test_label)
 
-        np.ndarray.dump(result[len(in_test_label)],open('results/'+str(filePath)+'_'+str(run)+'.np', 'wb'))
-        best_accuracy = calculate_accuracy(result[-1], test_label)
+        np.ndarray.dump(result[len(in_test_label)],open('results/'+ dataset + '_' +str(filePath)+'_'+str(run)+'.np', 'wb'))
+        best_accuracy = calculate_accuracy(result[-1], test_label, True)
         print('best accuracy is: ', best_accuracy)
 
-        open('results/'+modality+'.txt', 'a').write(filePath + ', accuracy: ' + str(best_accuracy) + '\n'*2)
-    
-featuresExtraction()
+        open('results/'+dataset +'_' + modality  +'.txt', 'a').write(filePath + ', accuracy: ' + str(best_accuracy) + '\n'*2)
+        plt.figure(1)
+        history_dict = history.history
+        history_dict.keys()
+        print(history.history.keys())
+
+        plt.plot(history.history['final_output_acc'])
+        plt.plot(history.history['val_final_output_acc'])
+        plt.title('Model Accuracy')
+        plt.ylabel('Accuracy')
+        plt.xlabel('Epoch')
+        plt.legend(['Training', 'Validation'], loc='lower right')
+        plt.show()    
+featuresExtraction('MOUD')  
 for drop in [0.5]:
     for rdrop in [0.3]:
         for r_units in [50]:
@@ -293,4 +315,4 @@ for drop in [0.5]:
                         modality = '_'.join(mode)
                         print ('\n',modality)
                         filePath  = modality + '_' + attn_type + '_' + str(drop) + '_' + str(drop) + '_' + str(rdrop) + '_' + str(r_units) + '_' + str(td_units)
-                        CIA_model(mode, filePath, attn_type=attn_type, drops=[drop, drop, rdrop], r_units=r_units, td_units=td_units)
+                        CIA_model(mode, filePath, dataset='MOUD', attn_type=attn_type, drops=[drop, drop, rdrop], r_units=r_units, td_units=td_units)

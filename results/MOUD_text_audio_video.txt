@@ -1,0 +1,50 @@
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6037735849056604
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6132075471698113
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6132075471698113
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.5471698113207547
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.5849056603773585
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.660377358490566
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6886792452830188
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.7075471698113207
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6886792452830188
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.7264150943396226
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6415094339622641
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.7641509433962265
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6981132075471698
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6037735849056604
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.39622641509433965
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6037735849056604
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6037735849056604
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6037735849056604
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.5943396226415094
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6037735849056604
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6037735849056604
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6037735849056604
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6037735849056604
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6037735849056604
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6226415094339622
+

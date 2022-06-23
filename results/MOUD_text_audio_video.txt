@@ -48,3 +48,9 @@ text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6037735849056604
 
 text_audio_video_mmmu_0.5_0.5_0.3_50_200, accuracy: 0.6226415094339622
 
+text_audio_video_mmmu_0.5_0.5_0.3_50_50, accuracy: 0.6886792452830188
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_50, accuracy: 0.6886792452830188
+
+text_audio_video_mmmu_0.5_0.5_0.3_50_50, accuracy: 0.7452830188679245
+

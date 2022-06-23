@@ -307,11 +307,11 @@ featuresExtraction('MOUD')
 for drop in [0.5]:
     for rdrop in [0.3]:
         for r_units in [50]:
-            for td_units in [200]:
+            for td_units in [50]:
                 attn_type = 'mmmu'
-                modalities = ['text','audio','video']
+                modalities = ['text','audio']
                 for i in range(1):
-                    for mode in itertools.combinations(modalities, 3):
+                    for mode in itertools.combinations(modalities, 2):
                         modality = '_'.join(mode)
                         print ('\n',modality)
                         filePath  = modality + '_' + attn_type + '_' + str(drop) + '_' + str(drop) + '_' + str(rdrop) + '_' + str(r_units) + '_' + str(td_units)

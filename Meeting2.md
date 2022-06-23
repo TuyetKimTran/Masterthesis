@@ -254,7 +254,7 @@ they don't share data anymore : " In 2018, we decided to stop sharing the data w
 - personality prediction similar to emotion prediction difference but personality is more diverse therefore more difficult
 - not so many datasets available. For prediction personality the most datasets came from competitions. 
 - most paper based on apparent personality analysis, not the true personality of the individuals 
-
+- a
 
  ## TO-DO 
     Read 5 papers and provide presentation. One of them is used as baseline and I should reproduce the results of it. Then the idea of the other papers are used to improve the baseline method. 

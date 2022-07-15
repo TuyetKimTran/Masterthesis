@@ -56,10 +56,13 @@ def calculate_accuracy(prediction, test_label, print_detailed_results=False):
 def CAM(att_type, x, y):
 
     if att_type == 'simple':
-        m_dash = dot([x, y], axes=[2,2])
+        m_dash = dot([x, y], axes=[2,2])    # corresponding to the desired axis from the first input 
+                                            # and the desired axis from the second input, respectively
         m = Activation('softmax')(m_dash)
-        h_dash = dot([m, y], axes=[2,1])
-        return multiply([h_dash, x])
+        h_dash = dot([m, y], axes=[2,1]) 
+        return multiply([h_dash, x]) # It takes as input a list of tensors, all of the same shape, and returns a single tensor (also of the same shape).
+
+
 
 def featuresExtraction(dataset):
     global train_text, train_audio, train_video, train_label
@@ -125,19 +128,12 @@ def CIA_model(mode, filePath, dataset, attn_type='mmmu', drops=[0.7, 0.5, 0.5], 
         drop1  = drops[1]
         r_drop = drops[2]
 
-        in_merged = []
-        in_model  = []
-        out_model = []
-        in_loss   = []
-        in_train  = []
-        in_valid  = []
-        in_test   = []
-        in_train_label  = []
         in_test_label   = []
 
         # =============================================================================================
         # ============================================== IIM ==========================================
-
+                                        # train_text shape (169, 21, 300)
+                                        # Input(shape=(21,300))
         in_text_audio      = Input(shape=(train_text.shape[1], train_text.shape[2]))
         encoded_text_audio = Dropout(drop1)(TimeDistributed(Dense(3*td_units, activation='tanh'))(in_text_audio))
         encoded_text_audio = Dropout(drop1)(TimeDistributed(Dense(2*td_units, activation='tanh'))(encoded_text_audio))
@@ -231,29 +227,51 @@ def CIA_model(mode, filePath, dataset, attn_type='mmmu', drops=[0.7, 0.5, 0.5], 
         # =============================================================================================
         # ======================================= Mean and CAM ========================================
 
+        # At first all the three modalities are passed through a separate Bi-GRU. Then, pair-wise concatenation is performed 
+        # over the output of Bi-GRU and passed through a fully-connected layer to extract the bi-modal interaction (BI). 
+        
+
+        # Input of CAM : CamTA = MeanTA and BiTA 
+
+        # TEXT und AUDIO
+
+        #BI Ta
         original_concat_text_audio = concatenate([td_text, td_audio])
         original_concat_td_text_audio = Dropout(drop1)(TimeDistributed(Dense(td_units, activation='relu'))(original_concat_text_audio))
+        
+        #MeanTa
         modified_avg_text_audio = Average()([td_text_audio,td_audio_text])
         original_modified_ta_att = CAM('simple', original_concat_td_text_audio, modified_avg_text_audio)
         modified_original_ta_att = CAM('simple', modified_avg_text_audio, original_concat_td_text_audio)
 
+
+        # AUDIO und VIDEO 
         original_concat_audio_video = concatenate([td_audio, td_video])
         original_concat_td_audio_video = Dropout(drop1)(TimeDistributed(Dense(td_units, activation='relu'))(original_concat_audio_video))
+        
+        
         modified_avg_audio_video = Average()([td_audio_video,td_video_audio])
         original_modified_av_att = CAM('simple', original_concat_td_audio_video, modified_avg_audio_video)
         modified_original_av_att = CAM('simple', modified_avg_audio_video, original_concat_td_audio_video)
 
+        # VIDEO und TEXT 
         original_concat_video_text = concatenate([td_video, td_text])
         original_concat_td_video_text = Dropout(drop1)(TimeDistributed(Dense(td_units, activation='relu'))(original_concat_video_text))
         modified_avg_video_text = Average()([td_video_text,td_text_video])
         original_modified_vt_att = CAM('simple', original_concat_td_video_text, modified_avg_video_text)
         modified_original_vt_att = CAM('simple', modified_avg_video_text, original_concat_td_video_text)
 
-        merged = concatenate([original_modified_ta_att,modified_original_ta_att,original_modified_av_att,modified_original_av_att,original_modified_vt_att,modified_original_vt_att])
+
+        # Im Diagramm Schritt Concatenate 
+        merged = concatenate([original_modified_ta_att,modified_original_ta_att,original_modified_av_att,modified_original_av_att,
+                              original_modified_vt_att,modified_original_vt_att])
+
+
+
 
         merged  = Dense(td_units, activation='relu')(merged)
         merged  = MeanOverTime()(merged)
-        final_output  = Dense(2, activation='softmax', name='final_output')(merged)   # hier anpassen wieviele outputs man hat!!
+        final_output  = Dense(3, activation='softmax', name='final_output')(merged)   # hier anpassen wieviele outputs man hat!!
 
         # =============================================================================================
         # ======================================= Model ===============================================
@@ -272,8 +290,8 @@ def CIA_model(mode, filePath, dataset, attn_type='mmmu', drops=[0.7, 0.5, 0.5], 
 
         history = model.fit([train_text,train_audio,train_video,train_text,train_text,train_audio,train_audio,train_video,train_video], 
                             [train_audio,train_video,train_text,train_video,train_text,train_audio,train_label],
-                            epochs=50, #auf 50 zurück machen!! 
-                            batch_size=16, # auf 16 !!
+                            epochs=1, #auf 50 zurück machen!! 
+                            batch_size=169, # auf 16 !!
                             shuffle=True,
                             callbacks=[check1, check2],
                             validation_data=([valid_text,valid_audio,valid_video,valid_text,valid_text,valid_audio,valid_audio,valid_video,valid_video], 
@@ -281,38 +299,41 @@ def CIA_model(mode, filePath, dataset, attn_type='mmmu', drops=[0.7, 0.5, 0.5], 
                             verbose=1)
 
         model.load_weights(path)
-        result = model.predict([test_text,test_audio,test_video,test_text,test_text,test_audio,test_audio,test_video,test_video])
-        print('results', result)
-        print('results[-1]' , result[-1])
-        print('testlabel' , test_label)
-
+        result = model.predict([test_text,test_audio,test_video,
+                                test_text,test_text,test_audio,test_audio,test_video,test_video])
+        # print('results', result)
+        # print('results[-1]' , result[-1])
+        # print('testlabel' , test_label)
+        # print('results[0]', result[0])
+        # result 
         np.ndarray.dump(result[len(in_test_label)],open('results/'+ dataset + '_' +str(filePath)+'_'+str(run)+'.np', 'wb'))
         best_accuracy = calculate_accuracy(result[-1], test_label, True)
         print('best accuracy is: ', best_accuracy)
 
         open('results/'+dataset +'_' + modality  +'.txt', 'a').write(filePath + ', accuracy: ' + str(best_accuracy) + '\n'*2)
-        plt.figure(1)
-        history_dict = history.history
-        history_dict.keys()
-        print(history.history.keys())
-
-        plt.plot(history.history['final_output_acc'])
-        plt.plot(history.history['val_final_output_acc'])
-        plt.title('Model Accuracy')
-        plt.ylabel('Accuracy')
-        plt.xlabel('Epoch')
-        plt.legend(['Training', 'Validation'], loc='lower right')
-        plt.show()    
-featuresExtraction('MOUD')  
+        # plt.figure(1)
+        # history_dict = history.history
+        # history_dict.keys()
+        # print(history.history.keys())
+        # print(history.history)
+        # plt.plot(history.history['final_output_acc'])
+        # plt.plot(history.history['val_final_output_acc'])
+        # plt.title('Model Accuracy')
+        # plt.ylabel('Accuracy')
+        # plt.xlabel('Epoch')
+        # plt.legend(['Training', 'Validation'], loc='lower right')
+        # plt.show()    
+featuresExtraction('YOUTUBE')          # YOUTUBE; MMMO or MOUD  
 for drop in [0.5]:
-    for rdrop in [0.3]:
-        for r_units in [50]:
-            for td_units in [50]:
+    for rdrop in [0.3]:                     # MOUD, MOSI, YOUTUBE, MMMO : 0.3, MOSEI 0.5 
+        for r_units in [50]:               # MOUD, MOSI, YOUTUBE 50, MMMo 200, MOSEI 100
+            for td_units in [200]:   # MOSI 50, MOUD 50, YOUTUBE 200, MOSEI 100, MMMO 100
                 attn_type = 'mmmu'
-                modalities = ['text','audio']
+                modalities = ['text','audio', 'video']
                 for i in range(1):
-                    for mode in itertools.combinations(modalities, 2):
+                    for mode in itertools.combinations(modalities, 3):
                         modality = '_'.join(mode)
                         print ('\n',modality)
                         filePath  = modality + '_' + attn_type + '_' + str(drop) + '_' + str(drop) + '_' + str(rdrop) + '_' + str(r_units) + '_' + str(td_units)
-                        CIA_model(mode, filePath, dataset='MOUD', attn_type=attn_type, drops=[drop, drop, rdrop], r_units=r_units, td_units=td_units)
+                        CIA_model(mode, filePath, dataset='YOUTUBE', attn_type=attn_type, drops=[drop, drop, rdrop], r_units=r_units, td_units=td_units)
+

@@ -13,6 +13,7 @@ from keras.utils.layer_utils import get_source_inputs
 from kutilities.layers import MeanOverTime
 # from tensorflow.keras.layers import Layer
 import matplotlib.pyplot as plt
+from keras.utils.vis_utils import plot_model
 
 
 from sklearn.metrics import classification_report, confusion_matrix, precision_recall_fscore_support, accuracy_score, f1_score
@@ -136,15 +137,6 @@ def CIA_model(mode, filePath, dataset, attn_type='mmmu', drops=[0.7, 0.5, 0.5], 
         drop0  = drops[0]
         drop1  = drops[1]
         r_drop = drops[2]
-
-        in_merged = []
-        in_model  = []
-        out_model = []
-        in_loss   = []
-        in_train  = []
-        in_valid  = []
-        in_test   = []
-        in_train_label  = []
         in_test_label   = []
 
         # =============================================================================================
@@ -270,9 +262,10 @@ def CIA_model(mode, filePath, dataset, attn_type='mmmu', drops=[0.7, 0.5, 0.5], 
         # =============================================================================================
         # ======================================= Model ===============================================
 
-        model = Model(inputs=[in_text,in_audio,in_video,in_text_audio,in_text_video,in_audio_text,in_audio_video,in_video_text,in_video_audio],outputs=[output_text_audio,output_text_video,output_audio_text,output_audio_video,output_video_text,output_video_audio,final_output])
+        model = Model(inputs=[in_text,in_audio,in_video,in_text_audio,in_text_video,in_audio_text,in_audio_video,in_video_text,in_video_audio],
+                      outputs=[output_text_audio,output_text_video,output_audio_text,output_audio_video,output_video_text,output_video_audio,final_output])
         model.compile(loss=['mse','mse','mse','mse','mse','mse','categorical_crossentropy'], sample_weight_mode='None', optimizer='adam', metrics=['acc'])
-
+        plot_model(model, to_file='model_plot.png', show_shapes=True, show_layer_names=True)
         path   = 'weights/'+ dataset + '_' +str(filePath)+ '_' +str(run)+'.hdf5'
         check1 = EarlyStopping(monitor='val_final_output_loss', patience=20)
         check2 = ModelCheckpoint(path, monitor='val_final_output_acc', verbose=1, save_weights_only=True,  save_best_only=True, mode='max')

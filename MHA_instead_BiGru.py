@@ -254,27 +254,6 @@ def CIA_model(mode, filePath, dataset, drops=[0.7, 0.5, 0.5], r_units=300, td_un
 
         # TEXT und AUDIO
 
-        # dp_layer = DotProductAttention(use_scale=True)
-        # x = dp_layer([td_text, td_text, td_text])
-        # print(f"Output from dot product attention: {x.shape}")
-        # mh_layer = MultiHeadAttention(h=8)
-        # x = mh_layer([td_text, td_text, td_text])
-        # print(f"Output from multi-head attention: {x.shape}")
-        
-        
-        # ydp_layer = DotProductAttention(use_scale=True)
-        # y = dp_layer([td_audio, td_audio, td_audio])
-        # print(f"Output from dot product attention: {y.shape}")
-        # ymh_layer = MultiHeadAttention(h=8)
-        # y = mh_layer([td_audio, td_audio, td_audio])
-        # print(f"Output from multi-head attention: {y.shape}")
-        
-        # zdp_layer = DotProductAttention(use_scale=True)
-        # z = dp_layer([td_video, td_video, td_video])
-        # print(f"Output from dot product attention: {z.shape}")
-        # zmh_layer = MultiHeadAttention(h=8)
-        # z = mh_layer([td_video, td_video, td_video])
-        # print(f"Output from multi-head attention: {z.shape}")
         
         original_concat_text_audio = concatenate([td_text, td_audio])
         original_concat_td_text_audio = Dropout(drop1)(TimeDistributed(Dense(td_units, activation='relu'))(original_concat_text_audio))

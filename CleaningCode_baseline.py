@@ -1,123 +1,7 @@
-import numpy as np, json
-import pickle, sys, argparse
-from keras.models import Model
-from keras import backend as K
-from keras import initializers
-from keras.optimizers import RMSprop
-from keras.utils import to_categorical
-from keras.callbacks import EarlyStopping, Callback, ModelCheckpoint
-from keras.layers import *
-from keras.utils.layer_utils import get_source_inputs
-from kutilities.layers import MeanOverTime
-from sklearn.metrics import classification_report, confusion_matrix, precision_recall_fscore_support, accuracy_score, f1_score
-import matplotlib.pyplot as plt
-
-
-global seed
-seed = 1337
-np.random.seed(seed)
-import gc
-from sklearn.metrics import mean_squared_error
-from scipy.stats import pearsonr
-from scipy.spatial.distance import cosine
-import itertools
-import h5py
-#=============================================================
-import os
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-#=============================================================
-import tensorflow as tf
-from keras.backend import set_session
-
-config = tf.compat.v1.ConfigProto()
-config.gpu_options.allow_growth = True
-config.log_device_placement = True
-set_session(tf.compat.v1.Session(config=config))
-#==============================================================
-# test
-def calculate_accuracy(prediction, test_label, print_detailed_results=False):
-
-    true_label=[]
-    predicted_label=[]
-
-    for i in range(prediction.shape[0]):
-        true_label.append(np.argmax(test_label[i] ))
-        predicted_label.append(np.argmax(prediction[i] ))
-
-    if print_detailed_results:
-        print ("Confusion Matrix :")
-        print (confusion_matrix(true_label, predicted_label))
-        print ("Classification Report :")
-        print (classification_report(true_label, predicted_label))
-
-    return accuracy_score(true_label, predicted_label)
-
-def CAM(att_type, x, y):
-
-    if att_type == 'simple':
-        m_dash = dot([x, y], axes=[2,2])    # corresponding to the desired axis from the first input 
-                                            # and the desired axis from the second input, respectively
-        m = Activation('softmax')(m_dash)
-        h_dash = dot([m, y], axes=[2,1]) 
-        return multiply([h_dash, x]) # It takes as input a list of tensors, all of the same shape, and returns a single tensor (also of the same shape).
-
-
-
-def featuresExtraction(dataset, classNo):
-    global train_text, train_audio, train_video, train_label
-    global valid_text, valid_audio, valid_video, valid_label
-    global test_text, test_audio, test_video, test_label
-    global max_segment_len
-
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/'+ dataset+ '/covarep_train.p', 'rb') as f:
-        train_audio = pickle.load(f, encoding='latin1')
-    train_audio = train_audio/np.max(train_audio)
-
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/covarep_valid.p', 'rb') as f:
-        valid_audio = pickle.load(f, encoding='latin1')
-    valid_audio = valid_audio/np.max(valid_audio)
-
-
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/covarep_test.p', 'rb') as f:
-        test_audio = pickle.load(f, encoding='latin1')
-    test_audio  = test_audio/np.max(test_audio)
-
-    with open ('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/facet_train.p', 'rb') as f:
-        train_video = pickle.load(f, encoding='latin1')
-    train_video = train_video/np.max(train_video)
-
-    with open ('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/facet_valid.p', 'rb') as f:
-        valid_video = pickle.load(f, encoding='latin1')
-    valid_video = valid_video/np.max(valid_video)
-
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/facet_test.p', 'rb') as f:
-        test_video  = pickle.load(f, encoding='latin1')
-    test_video  = test_video/np.max(test_video)
-
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/text_train.p', 'rb') as f:
-        train_text  = pickle.load(f, encoding='latin1')
-    train_text  = train_text/np.max(train_text)
-
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/text_valid.p', 'rb') as f:
-        valid_text  = pickle.load(f, encoding='latin1')
-    valid_text  = valid_text/np.max(valid_text)
-
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/text_test.p', 'rb') as f:
-        test_text   = pickle.load(f, encoding='latin1')
-    test_text   = test_text/np.max(test_text)
-
-    max_segment_len = train_text.shape[1]
-
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/y_train.p', 'rb') as f:
-        train_label = pickle.load(f, encoding='latin1')
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/y_valid.p', 'rb') as f:
-        valid_label = pickle.load(f, encoding='latin1')
-    with open('/Users/tuyet/Desktop/Masterthesis/datasets/' + dataset + '/y_test.p', 'rb') as f:
-        test_label  = pickle.load(f, encoding='latin1')
+from keras.utils.vis_utils import plot_model
 
 # ================================================== simple 3 =========================================
-def CIA_model(mode, filePath, dataset, classNo, drops=[0.7, 0.5, 0.5], r_units=300, td_units=100):
+def CIA_model(mode, filePath, dataset,classNo, drops=[0.7, 0.5, 0.5], r_units=300, td_units=100):
 
     runs = 1
     best_accuracy = 0
@@ -128,12 +12,19 @@ def CIA_model(mode, filePath, dataset, classNo, drops=[0.7, 0.5, 0.5], r_units=3
         drop1  = drops[1]
         r_drop = drops[2]
 
+        in_merged = []
+        in_model  = []
+        out_model = []
+        in_loss   = []
+        in_train  = []
+        in_valid  = []
+        in_test   = []
+        in_train_label  = []
         in_test_label   = []
 
         # =============================================================================================
         # ============================================== IIM ==========================================
-                                        # train_text shape (169, 21, 300)
-                                        # Input(shape=(21,300))
+
         in_text_audio      = Input(shape=(train_text.shape[1], train_text.shape[2]))
         encoded_text_audio = Dropout(drop1)(TimeDistributed(Dense(3*td_units, activation='tanh'))(in_text_audio))
         encoded_text_audio = Dropout(drop1)(TimeDistributed(Dense(2*td_units, activation='tanh'))(encoded_text_audio))
@@ -227,108 +118,67 @@ def CIA_model(mode, filePath, dataset, classNo, drops=[0.7, 0.5, 0.5], r_units=3
         # =============================================================================================
         # ======================================= Mean and CAM ========================================
 
-        # At first all the three modalities are passed through a separate Bi-GRU. Then, pair-wise concatenation is performed 
-        # over the output of Bi-GRU and passed through a fully-connected layer to extract the bi-modal interaction (BI). 
-        
-
-        # Input of CAM : CamTA = MeanTA and BiTA 
-
-        # TEXT und AUDIO
-
-        #BI Ta
         original_concat_text_audio = concatenate([td_text, td_audio])
         original_concat_td_text_audio = Dropout(drop1)(TimeDistributed(Dense(td_units, activation='relu'))(original_concat_text_audio))
-        
-        #MeanTa
         modified_avg_text_audio = Average()([td_text_audio,td_audio_text])
         original_modified_ta_att = CAM('simple', original_concat_td_text_audio, modified_avg_text_audio)
         modified_original_ta_att = CAM('simple', modified_avg_text_audio, original_concat_td_text_audio)
 
-
-        # AUDIO und VIDEO 
         original_concat_audio_video = concatenate([td_audio, td_video])
         original_concat_td_audio_video = Dropout(drop1)(TimeDistributed(Dense(td_units, activation='relu'))(original_concat_audio_video))
-        
-        
         modified_avg_audio_video = Average()([td_audio_video,td_video_audio])
         original_modified_av_att = CAM('simple', original_concat_td_audio_video, modified_avg_audio_video)
         modified_original_av_att = CAM('simple', modified_avg_audio_video, original_concat_td_audio_video)
 
-        # VIDEO und TEXT 
         original_concat_video_text = concatenate([td_video, td_text])
         original_concat_td_video_text = Dropout(drop1)(TimeDistributed(Dense(td_units, activation='relu'))(original_concat_video_text))
         modified_avg_video_text = Average()([td_video_text,td_text_video])
         original_modified_vt_att = CAM('simple', original_concat_td_video_text, modified_avg_video_text)
         modified_original_vt_att = CAM('simple', modified_avg_video_text, original_concat_td_video_text)
 
-
-        # Im Diagramm Schritt Concatenate 
-        merged = concatenate([original_modified_ta_att,modified_original_ta_att,original_modified_av_att,modified_original_av_att,
-                              original_modified_vt_att,modified_original_vt_att])
-
-
-
+        merged = concatenate([original_modified_ta_att,modified_original_ta_att,original_modified_av_att,modified_original_av_att,original_modified_vt_att,modified_original_vt_att])
 
         merged  = Dense(td_units, activation='relu')(merged)
         merged  = MeanOverTime()(merged)
-        final_output  = Dense(classNo, activation='softmax', name='final_output')(merged)   # hier anpassen wieviele outputs man hat!!
+        final_output  = Dense(3     , activation='softmax', name='final_output')(merged)
 
         # =============================================================================================
         # ======================================= Model ===============================================
 
-        model = Model(inputs=[in_text,in_audio,in_video,in_text_audio,in_text_video,in_audio_text,in_audio_video,in_video_text,in_video_audio], # 3x single und die 6 combos
-        outputs=[output_text_audio,output_text_video,output_audio_text,output_audio_video,output_video_text,output_video_audio,final_output]) # 6 combos + final output
+        model = Model(inputs=[in_text,in_audio,in_video,in_text_audio,in_text_video,in_audio_text,in_audio_video,in_video_text,in_video_audio],outputs=[output_text_audio,output_text_video,output_audio_text,output_audio_video,output_video_text,output_video_audio,final_output])
         model.compile(loss=['mse','mse','mse','mse','mse','mse','categorical_crossentropy'], sample_weight_mode='None', optimizer='adam', metrics=['acc'])
 
-        # vorher metrics=['accuracy'])
-
-        path   = 'weights/'+str(filePath)+'_'+str(run)+'.hdf5'
-        print(path)
+        path   = '/content/drive/MyDrive/weights/' + dataset + str(filePath)+'_'+str(run)+'.hdf5'
         check1 = EarlyStopping(monitor='val_final_output_loss', patience=20)
-        check2 = ModelCheckpoint(path, monitor='val_final_output_acc', verbose=1,save_best_only=True, save_weights_only=True, mode='max')
+        check2 = ModelCheckpoint(path, monitor='val_final_output_acc', verbose=1, save_weights_only=True,  save_best_only=True, mode='max')
+        %load_ext autotime
 
 
-        history = model.fit([train_text,train_audio,train_video,train_text,train_text,train_audio,train_audio,train_video,train_video], 
+        history = model.fit([train_text,train_audio,train_video,train_text,train_text,train_audio,train_audio,train_video,train_video],
                             [train_audio,train_video,train_text,train_video,train_text,train_audio,train_label],
-                            epochs=1, #auf 50 zurück machen!! 
-                            batch_size=169, # auf 16 !!
+                            epochs=50, #auf 50 zurück machen!! 
+                            batch_size=16, # auf 16 !!
                             shuffle=True,
                             callbacks=[check1, check2],
-                            validation_data=([valid_text,valid_audio,valid_video,valid_text,valid_text,valid_audio,valid_audio,valid_video,valid_video], 
-                            [valid_audio,valid_video,valid_text,valid_video,valid_text,valid_audio,valid_label]),
+                            validation_data=([valid_text,valid_audio,valid_video,valid_text,valid_text,valid_audio,valid_audio,valid_video,valid_video], [valid_audio,valid_video,valid_text,valid_video,valid_text,valid_audio,valid_label]),
                             verbose=1)
 
         model.load_weights(path)
-        result = model.predict([test_text,test_audio,test_video,
-                                test_text,test_text,test_audio,test_audio,test_video,test_video])
-        # print('results', result)
-        # print('results[-1]' , result[-1])
-        # print('testlabel' , test_label)
-        # print('results[0]', result[0])
-        # result 
-        np.ndarray.dump(result[len(in_test_label)],open('results/'+ dataset + '_' +str(filePath)+'_'+str(run)+'.np', 'wb'))
-        best_accuracy = calculate_accuracy(result[-1], test_label, True)
-        print('best accuracy is: ', best_accuracy)
+        result = model.predict([test_text,test_audio,test_video,test_text,test_text,test_audio,test_audio,test_video,test_video])
 
-        open('results/'+dataset +'_' + modality  +'.txt', 'a').write(filePath + ', accuracy: ' + str(best_accuracy) + '\n'*2)
-        plt.plot(history.history['final_output_acc'])
-        plt.plot(history.history['val_final_output_acc'])
-        plt.title('Model Accuracy')
-        plt.ylabel('Accuracy')
-        plt.xlabel('Epoch')
-        plt.legend(['Training', 'Validation'], loc='lower right')
-        plt.show()   
-        # plt.show()    
+        np.ndarray.dump(result[len(in_test_label)],open('/content/drive/MyDrive/results/' + dataset +str(filePath)+'_'+str(run)+'.np', 'wb'))
+        best_accuracy = calculate_accuracy(result[-1], test_label)
 
+        open('/content/drive/MyDrive/results/'+ dataset + '_' + modelType + '_' + modality+'.txt', 'a').write(filePath + ', accuracy: ' + str(best_accuracy) + '\n'*2)        # plt.figure(1)
 
-dataset = 'MMMO'
+dataset = 'YOUTUBE'
 modelType = 'Baseline'
-classNo = 2
+classNo = 3
 featuresExtraction(dataset,classNo)   # hier ersetzen
 for drop in [0.5]:
     for rdrop in [0.3]:               # MOUD, MOSI, YOUTUBE, MMMO : 0.3, MOSEI 0.5 
-        for r_units in [200]:          # MOUD, MOSI, YOUTUBE 50, MMMo 200, MOSEI 100
-            for td_units in [100]:    # MOSI 50, MOUD 50, YOUTUBE 200, MOSEI 100, MMMO 100
+        for r_units in [50]:          # MOUD, MOSI, YOUTUBE 50, MMMo 200, MOSEI 100
+            for td_units in [200]:    # MOSI 50, MOUD 50, YOUTUBE 200, MOSEI 100, MMMO 100
                 modalities = ['text','audio','video']
                 for i in range(1):
                     for mode in itertools.combinations(modalities, 3):

@@ -12,6 +12,7 @@ from keras.utils.layer_utils import get_source_inputs
 from kutilities.layers import MeanOverTime
 from sklearn.metrics import classification_report, confusion_matrix, precision_recall_fscore_support, accuracy_score, f1_score
 import matplotlib.pyplot as plt
+from keras_multi_head import MultiHeadAttention
 
 
 global seed
@@ -118,9 +119,9 @@ def featuresExtraction(dataset):
         test_label  = pickle.load(f, encoding='latin1')
 
 # ================================================== simple 3 =========================================
-# ================================================== simple 3 =========================================
-def CIA_model(mode, filePath, dataset, drops, r_units, td_units):
 
+# ================================================== simple 3 =========================================
+def CIA_model(mode, filePath, dataset, attn_type='mmmu', drops=[0.7, 0.5, 0.5], r_units=300, td_units=100):
     
     runs = 1
     best_accuracy = 0
@@ -288,12 +289,12 @@ def CIA_model(mode, filePath, dataset, drops, r_units, td_units):
 #         modified_avg_video_text = Average()([td_video_text,td_text_video])
 #         original_modified_vt_att = CAM('simple', original_concat_td_video_text, modified_avg_video_text)
 #         modified_original_vt_att = CAM('simple', modified_avg_video_text, original_concat_td_video_text)
+# das hatte net geklappt
 
 
-
-        att_layer_text, weights = MultiHeadAttention(8,td_text.shape, return_attention_scores=True)
-        att_layer_audio, weights = MultiHeadAttention(8,td_audio.shape, return_attention_scores=True)
-        att_layer_video, weights = MultiHeadAttention(8,td_video.shape, return_attention_scores=True)
+        att_layer_text = MultiHeadAttention(head_num =4)(td_text)
+        att_layer_audio = MultiHeadAttention(head_num =4)(td_audio)
+        att_layer_video = MultiHeadAttention(head_num =4)(td_video)
 
         original_concat_text_audio = concatenate([att_layer_text, att_layer_audio])
         original_concat_td_text_audio = Dropout(drop1)(TimeDistributed(Dense(td_units, activation='relu'))(original_concat_text_audio))
@@ -324,48 +325,32 @@ def CIA_model(mode, filePath, dataset, drops, r_units, td_units):
         # =============================================================================================
         # ======================================= Model ===============================================
 
-        model = Model(inputs=[in_text,in_audio,in_video,in_text_audio,in_text_video,in_audio_text,in_audio_video,in_video_text,in_video_audio], # 3x single und die 6 combos
-        outputs=[output_text_audio,output_text_video,output_audio_text,output_audio_video,output_video_text,output_video_audio,final_output]) # 6 combos + final output
+        model = Model(inputs=[in_text,in_audio,in_video,in_text_audio,in_text_video,in_audio_text,in_audio_video,in_video_text,in_video_audio],outputs=[output_text_audio,output_text_video,output_audio_text,output_audio_video,output_video_text,output_video_audio,final_output])
         model.compile(loss=['mse','mse','mse','mse','mse','mse','categorical_crossentropy'], sample_weight_mode='None', optimizer='adam', metrics=['acc'])
 
-        # vorher metrics=['accuracy'])
-
-        path   = 'weights/'+str(filePath)+'_'+str(run)+'.hdf5'
-        print(path)
+        path   = './weights/' + dataset + str(filePath)+'_'+str(run)+'.hdf5'
         check1 = EarlyStopping(monitor='val_final_output_loss', patience=20)
-        check2 = ModelCheckpoint(path, monitor='val_final_output_acc', verbose=1,save_best_only=True, save_weights_only=True, mode='max')
+        check2 = ModelCheckpoint(path, monitor='val_final_output_acc', verbose=1, save_weights_only=True,  save_best_only=True, mode='max')
 
 
-        history = model.fit([train_text,train_audio,train_video,train_text,train_text,train_audio,train_audio,train_video,train_video], 
+        history = model.fit([train_text,train_audio,train_video,train_text,train_text,train_audio,train_audio,train_video,train_video],
                             [train_audio,train_video,train_text,train_video,train_text,train_audio,train_label],
                             epochs=50, #auf 50 zurück machen!! 
                             batch_size=16, # auf 16 !!
                             shuffle=True,
                             callbacks=[check1, check2],
-                            validation_data=([valid_text,valid_audio,valid_video,valid_text,valid_text,valid_audio,valid_audio,valid_video,valid_video], 
-                            [valid_audio,valid_video,valid_text,valid_video,valid_text,valid_audio,valid_label]),
+                            validation_data=([valid_text,valid_audio,valid_video,valid_text,valid_text,valid_audio,valid_audio,valid_video,valid_video], [valid_audio,valid_video,valid_text,valid_video,valid_text,valid_audio,valid_label]),
                             verbose=1)
 
         model.load_weights(path)
-        result = model.predict([test_text,test_audio,test_video,
-                                test_text,test_text,test_audio,test_audio,test_video,test_video])
-        # print('results', result)
-        # print('results[-1]' , result[-1])
-        # print('testlabel' , test_label)
-        # print('results[0]', result[0])
-        # result 
-        np.ndarray.dump(result[len(in_test_label)],open('results/'+ dataset + '_' +str(filePath)+'_'+str(run)+'.np', 'wb'))
-        best_accuracy = calculate_accuracy(result[-1], test_label, True)
-        print('best accuracy is: ', best_accuracy)
+        result = model.predict([test_text,test_audio,test_video,test_text,test_text,test_audio,test_audio,test_video,test_video])
 
-        open('results/'+dataset +'_' + modality  +'.txt', 'a').write(filePath + ', accuracy: ' + str(best_accuracy) + '\n'*2)
-        # plt.figure(1)
-        # history_dict = history.history
-        # history_dict.keys()
-        # print(history.history.keys())
-        # print(history.history)
-        # plot_model(model, to_file='model_plot_MHA_Instead_BiGru.png', show_shapes=True, show_layer_names=True)
-
+        np.ndarray.dump(result[len(in_test_label)],open('./results/' + dataset +str(filePath)+'_'+str(run)+'.np', 'wb'))
+        best_accuracy = calculate_accuracy(result[-1], test_label)
+        print(best_accuracy)
+        open('./results/'+ dataset +modality+'.txt', 'a').write(filePath + ', accuracy: ' + str(best_accuracy) + '\n'*2)
+        plot_model(model, to_file='model_plot_MHAvonTF_allModlitys.png', show_shapes=True, show_layer_names=True)
+        
         plt.plot(history.history['final_output_acc'])
         plt.plot(history.history['val_final_output_acc'])
         plt.title('Model Accuracy')
@@ -373,18 +358,19 @@ def CIA_model(mode, filePath, dataset, drops, r_units, td_units):
         plt.xlabel('Epoch')
         plt.legend(['Training', 'Validation'], loc='lower right')
         plt.show()    
-featuresExtraction('YOUTUBE')          # YOUTUBE; MMMO or MOUD  
+        
+        
+        
+featuresExtraction('YOUTUBE')   # hier ersetzen
 for drop in [0.5]:
-    for rdrop in [0.3]:                     # MOUD, MOSI, YOUTUBE, MMMO : 0.3, MOSEI 0.5 
-        for r_units in [50]:               # MOUD, MOSI, YOUTUBE 50, MMMo 200, MOSEI 100
-            for td_units in [200]:   # MOSI 50, MOUD 50, YOUTUBE 200, MOSEI 100, MMMO 100
-                modalities = ['text','audio', 'video']
-                modification ="MHA_instead_BiGru"
+    for rdrop in [0.3]:               # MOUD, MOSI, YOUTUBE, MMMO : 0.3, MOSEI 0.5 
+        for r_units in [50]:          # MOUD, MOSI, YOUTUBE 50, MMMo 200, MOSEI 100
+            for td_units in [200]:    # MOSI 50, MOUD 50, YOUTUBE 200, MOSEI 100, MMMO 100
+                attn_type = 'mmmu'
+                modalities = ['text','audio','video']
                 for i in range(1):
                     for mode in itertools.combinations(modalities, 3):
                         modality = '_'.join(mode)
                         print ('\n',modality)
-                        filePath  = modification + '_'  + '_' + str(drop) + '_' + str(drop) + '_' + str(rdrop) + '_' + str(r_units) + '_' + str(td_units)
-                        CIA_model(mode, filePath, dataset='YOUTUBE', drops=[drop, drop, rdrop], r_units=r_units, td_units=td_units)
-
-
+                        filePath  = modality + '_' + attn_type + '_' + str(drop) + '_' + str(drop) + '_' + str(rdrop) + '_' + str(r_units) + '_' + str(td_units)
+                        CIA_model(mode, filePath, attn_type=attn_type, drops=[drop, drop, rdrop], r_units=r_units, td_units=td_units, dataset='YOUTUBE')

@@ -127,7 +127,7 @@ def featuresExtraction(dataset):
     valid_label = to_categorical(y_valid - y_valid.min())
 
 # ================================================== simple 3 =========================================
-def CIA_model(mode, filePath, dataset, attn_type='mmmu', drops=[0.7, 0.5, 0.5], r_units=300, td_units=100):
+def CIA_model(mode, filePath, dataset,classNo, modelType, drops=[0.7, 0.5, 0.5], r_units=300, td_units=100):
 
     runs = 1
     best_accuracy = 0
@@ -257,7 +257,7 @@ def CIA_model(mode, filePath, dataset, attn_type='mmmu', drops=[0.7, 0.5, 0.5], 
 
         merged  = Dense(td_units, activation='relu')(merged)
         merged  = MeanOverTime()(merged)
-        final_output  = Dense(7     , activation='softmax', name='final_output')(merged)
+        final_output  = Dense(classNo     , activation='softmax', name='final_output')(merged)
 
         # =============================================================================================
         # ======================================= Model ===============================================
@@ -265,7 +265,6 @@ def CIA_model(mode, filePath, dataset, attn_type='mmmu', drops=[0.7, 0.5, 0.5], 
         model = Model(inputs=[in_text,in_audio,in_video,in_text_audio,in_text_video,in_audio_text,in_audio_video,in_video_text,in_video_audio],
                       outputs=[output_text_audio,output_text_video,output_audio_text,output_audio_video,output_video_text,output_video_audio,final_output])
         model.compile(loss=['mse','mse','mse','mse','mse','mse','categorical_crossentropy'], sample_weight_mode='None', optimizer='adam', metrics=['acc'])
-        plot_model(model, to_file='model_plot.png', show_shapes=True, show_layer_names=True)
         path   = 'weights/'+ dataset + '_' +str(filePath)+ '_' +str(run)+'.hdf5'
         check1 = EarlyStopping(monitor='val_final_output_loss', patience=20)
         check2 = ModelCheckpoint(path, monitor='val_final_output_acc', verbose=1, save_weights_only=True,  save_best_only=True, mode='max')
@@ -286,15 +285,13 @@ def CIA_model(mode, filePath, dataset, attn_type='mmmu', drops=[0.7, 0.5, 0.5], 
         np.ndarray.dump(result[len(in_test_label)],open('results/'+ dataset + '_7 classes' +'_' +str(filePath)+'_'+str(run)+'.np', 'wb'))
         best_accuracy = calculate_accuracy(result[-1], test_label)
 
-        open('results/'+dataset + '_7 classes' +'_' + modality  +'.txt', 'a').write(filePath + ', accuracy: ' + str(best_accuracy) + '\n'*2)
+        open('results/'+dataset + '_7 classes' +'_'+ modelType + '_' + modality  +'.txt', 'a').write(filePath + ', accuracy: ' + str(best_accuracy) + '\n'*2)
         print('best accuracy is: ', best_accuracy)
-        plt.plot(history.history['final_output_acc'])
-        plt.plot(history.history['val_final_output_acc'])
-        plt.title('Model Accuracy')
-        plt.ylabel('Accuracy')
-        plt.xlabel('Epoch')
-        plt.legend(['Training', 'Validation'], loc='lower right')
-        plt.show()    
+
+
+dataset='MOSI'
+classNo = 7
+modelType = 'baseline'    
 featuresExtraction('MOSI')
 for drop in [0.5]:
     for rdrop in [0.3]:                                 # MOUD, MOSI, YOUTUBE, MMMO : 0.3, MOSEI 0.5 
@@ -306,5 +303,5 @@ for drop in [0.5]:
                     for mode in itertools.combinations(modalities, 3):
                         modality = '_'.join(mode)
                         print ('\n',modality)
-                        filePath  = modality + '_' + attn_type + '_' + str(drop) + '_' + str(drop) + '_' + str(rdrop) + '_' + str(r_units) + '_' + str(td_units)
-                        CIA_model(mode, filePath, attn_type=attn_type, drops=[drop, drop, rdrop], r_units=r_units, td_units=td_units, dataset='MOSI')
+                        filePath  = modality 
+                        CIA_model(mode, filePath, drops=[drop, drop, rdrop], r_units=r_units, td_units=td_units, dataset=dataset, classNo=classNo, modelType=modelType)

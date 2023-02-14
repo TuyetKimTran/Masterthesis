@@ -9,11 +9,11 @@ dynamics of visual, audio, and text features in multimodal sentiment analysis. T
 
 ## Results
 To show, that the MHCA model is effectively using all three modalities for sentiment prediction,the MHCA model is evaluated on all possible input combinations, uni-modal (text only, audio only, video only), bi-modal (text and video, text and audio, audio and video), and tri-modal (text, audio, and video). The MHCA model performs best on all datasets when all three modalities are combined.
- ![Results unimodal vs Bimodal vs Trimodal](/assets\images\UniModalBiModalTrimodal.png)
+ ![Results unimodal vs Bimodal vs Trimodal](/assets/images/UniModalBiModalTrimodal.png)
 
 The MHCA model was compared with state-of-the-art models, including MV-LST, BC-LSTM, TFN, MARN, MFN, MFM, CIA, and the reimplementation of CIA (R-
 CIA), in terms of maximum accuracy and F1-score.
- ![Comparative Analysis results](/assets\images\UniModalBiModalTrimodal.png)
+ ![Comparative Analysis results](/assets/images/Comparative_Analysis.png)
 
 
 ## Get started
@@ -24,6 +24,7 @@ CIA), in terms of maximum accuracy and F1-score.
 2. Open the Python notebook **Multimodal sentiment Analysis.ipynb** on your Computer or in Google Colab. 
 
 3. If you encounter an error, update an outdated modules by replacing the second line in the "layers.py" module: "from keras.engine.topology import Layer" to "from tensorflow.keras.layers import Layer". The error message looks like this:
+
  ![Error message](/assets/images/error_message.png)
 
 4. Remember to change the directory in the second cell to the directory where you saved the datasets. This cell unzips the datasets.
